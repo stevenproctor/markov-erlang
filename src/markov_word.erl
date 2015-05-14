@@ -42,19 +42,19 @@
                             | ignore
                             | {error, {already_started, pid()}}
                             | {error, term()}.
-start_link(Word) when is_atom(Word) ->
-    gen_server:start_link({local, Word}, ?MODULE, [], []).
+start_link(WordKey) when is_atom(WordKey) ->
+    gen_server:start_link({local, WordKey}, ?MODULE, [], []).
 
 
 -spec add_following_word(string(), string()) -> ok.
 add_following_word(Word, FollowingWord) ->
-    WordKey = find_process_for_word(Word),
-    gen_server:call(WordKey, {add_following_word, FollowingWord}).
+    WordPid = find_process_for_word(Word),
+    gen_server:call(WordPid, {add_following_word, FollowingWord}).
 
 -spec pick_next_word_after(string()) -> string().
 pick_next_word_after(Word) ->
-    WordKey = find_process_for_word(Word),
-    gen_server:call(WordKey, {pick_next_word}).
+    WordPid = find_process_for_word(Word),
+    gen_server:call(WordPid, {pick_next_word}).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -154,7 +154,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 -spec find_process_for_word(string()) -> pid().
 find_process_for_word(Word) ->
-    WordKey = list_to_atom(Word),
+    WordKey = get_registered_name_for_word(Word),
     case whereis(WordKey) of
         undefined -> register_word(WordKey);
         Pid when is_pid(Pid) -> Pid
@@ -179,6 +179,9 @@ pick_random(List) ->
     Index = random:uniform(Length),
     lists:nth(Index, List).
 
+-spec get_registered_name_for_word(string()) -> atom().
+get_registered_name_for_word(Word) ->
+    list_to_atom("markov_word::" ++ Word).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
