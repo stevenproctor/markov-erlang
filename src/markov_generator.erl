@@ -51,8 +51,7 @@ generate_chain(FirstWord, Length) ->
 
 -spec parse_text(string()) -> ok.
 parse_text(Text) ->
-    [FirstWord | Words] = tokenize(Text),
-    load_words(FirstWord, Words).
+    gen_server:call(?MODULE, {parse_text, Text}).
 
 
 
