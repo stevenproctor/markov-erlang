@@ -46,7 +46,7 @@ start_link() ->
 
 
 -spec generate_chain(string(), non_neg_integer()) -> string().
-generate_chain(FirstWord, Length) ->
+generate_chain(FirstWord, Length) when Length > 0 ->
     gen_server:call(?MODULE, {generate_chain, FirstWord, Length}).
 
 -spec parse_text(string()) -> ok.
@@ -169,9 +169,13 @@ load_words(Word, [Following | Words]) ->
 generate(_NextWord, 1, Words) ->
     WordListOrdered = lists:reverse(Words),
     string:join(WordListOrdered, " ");
-generate(NextWord, Length, Words=[Word | _]) ->
-    Next = NextWord(Word),
-    generate(NextWord, Length - 1, [Next | Words]).
+generate(NextWord, Length, Words0=[Word | _]) ->
+    Words1 =
+        case NextWord(Word) of
+            [] -> Words0;
+            Next -> [Next|Words0]
+        end,
+    generate(NextWord, Length - 1, Words1).
 
 
 

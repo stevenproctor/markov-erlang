@@ -10,6 +10,7 @@
 
 -export([start/0,
          prime/1,
+         prime_file/1,
          generate_chain/2]).
 
 %%%===================================================================
@@ -23,6 +24,11 @@ start() ->
 -spec prime(string()) -> ok.
 prime(Text) ->
     markov_generator:parse_text(Text).
+
+-spec prime_file(string()) -> ok.
+prime_file(Filename) ->
+    {ok, Bin} = file:read_file(Filename),
+    markov_generator:parse_text(binary_to_list(Bin)).
 
 -spec generate_chain(string(), non_neg_integer()) -> string().
 generate_chain(Word, WordCount) ->
