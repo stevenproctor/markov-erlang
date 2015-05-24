@@ -46,7 +46,7 @@ start_link() ->
 
 
 -spec generate_chain(string(), non_neg_integer()) -> string().
-generate_chain(FirstWord, Length) ->
+generate_chain(FirstWord, Length) when Length > 0 ->
     gen_server:call(?MODULE, {generate_chain, FirstWord, Length}).
 
 -spec parse_text(string()) -> ok.
