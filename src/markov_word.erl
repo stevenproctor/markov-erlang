@@ -174,6 +174,7 @@ pick_next_word(Words) ->
     pick_random(Words).
 
 -spec pick_random([string(), ...]) -> string().
+pick_random([]) -> [];
 pick_random(List) ->
     Length = length(List),
     Index = random:uniform(Length),
