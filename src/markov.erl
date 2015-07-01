@@ -10,6 +10,7 @@
 
 -export([start/0,
          prime/1,
+         prime_from_file/1,
          generate_chain/2]).
 
 %%%===================================================================
@@ -19,6 +20,10 @@
 -spec start() -> ok | {error, term()}.
 start() ->
     application:start(markov).
+
+-spec prime_from_file(string()) -> ok.
+prime_from_file(FileName) ->
+    markov_generator:parse_text_from_file(FileName).
 
 -spec prime(string()) -> ok.
 prime(Text) ->

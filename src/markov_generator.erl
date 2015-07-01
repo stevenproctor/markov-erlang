@@ -12,6 +12,7 @@
 
 -export([start_link/0,
          generate_chain/2,
+         parse_text_from_file/1,
          parse_text/1]).
 
 %% gen_server callbacks
@@ -48,6 +49,10 @@ start_link() ->
 -spec generate_chain(string(), non_neg_integer()) -> string().
 generate_chain(FirstWord, Length) ->
     gen_server:call(?MODULE, {generate_chain, FirstWord, Length}).
+
+-spec parse_text_from_file(string()) -> ok.
+parse_text_from_file(FileName) ->
+    gen_server:call(?MODULE, {parse_text_from_file, FileName}).
 
 -spec parse_text(string()) -> ok.
 parse_text(Text) ->
@@ -94,6 +99,12 @@ handle_call({generate_chain, FirstWord, Length}, _From, State) ->
     NextWordFunction = fun markov_word:pick_next_word_after/1,
     Reply = generate(NextWordFunction, Length, [FirstWord]),
     {reply, Reply, State};
+handle_call({parse_text_from_file, FileName}, _From, State) ->
+    {ok, Content} = file:read_file(FileName),
+    Text = binary_to_list(Content),
+    [FirstWord | Words] = tokenize(Text),
+    load_words(FirstWord, Words),
+    {reply, ok, State};
 handle_call({parse_text, Text}, _From, State) ->
     [FirstWord | Words] = tokenize(Text),
     load_words(FirstWord, Words),
@@ -156,7 +167,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 -spec tokenize(string()) -> [string(), ...].
 tokenize(Text) ->
-    string:tokens(Text, " \t\n").
+    string:tokens(Text, " \t\n\r").
 
 -spec load_words(nonempty_string(), [nonempty_string(), ...]) -> ok.
 load_words(_Word, []) ->
