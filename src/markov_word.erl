@@ -173,7 +173,9 @@ add_word_to_list(Words, Word) ->
 pick_next_word(Words) ->
     pick_random(Words).
 
--spec pick_random([string(), ...]) -> string().
+-spec pick_random([string(), ...]) -> string() | undefined.
+pick_random([]) ->
+    undefined;
 pick_random(List) ->
     Length = length(List),
     Index = random:uniform(Length),

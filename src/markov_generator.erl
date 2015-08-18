@@ -182,7 +182,10 @@ generate(_NextWord, 1, Words) ->
     string:join(WordListOrdered, " ");
 generate(NextWord, Length, Words=[Word | _]) ->
     Next = NextWord(Word),
-    generate(NextWord, Length - 1, [Next | Words]).
+    case Next of
+        undefined -> generate(NextWord, 1, Words);
+        _ -> generate(NextWord, Length - 1, [Next | Words])
+    end.
 
 
 
